@@ -4,3 +4,7 @@ body {
   color: #333;
   padding: 2rem;
 }
+
+ul > * + * {
+  margin-top: .5em;
+}
