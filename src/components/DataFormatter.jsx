@@ -1,29 +1,23 @@
 import { useMemo } from "react";
 
+function generateNodeTree(array, parentId = undefined) {
+  return array.filter(i => i.parent === parentId)
+    .map(({ name, id }) => {
+      let childrenTree = generateNodeTree(array, id);
+
+      return ({
+        name,
+        id,
+        ...(childrenTree.length > 0 ? { children: childrenTree } : null)
+      });
+    });
+};
+
 const DataFormatter = ({ children, data }) => {
-  const formattedList = useMemo(() => {
-    const firstAncestors = data.filter(i => !i.parent);
-  
-    // Function to populate the children property of an item. It will be called recursively.
-    const writeChildrenOfItem = (item, list) => {
-      const children = [];
-  
-      for (let possibleChild of list) {
-        if (possibleChild.parent === item.id) {
-          // We extract the "parent" property in the new format.
-          const { parent, ...child } = possibleChild;
-          // We populate the children property of the item before saving it.
-          const childWithChildren = writeChildrenOfItem(child, list);
-  
-          children.push(childWithChildren);
-        }
-      }
-  
-      return { ...item, ...(children.length > 0 && { children }) };
-    };
-  
-    return firstAncestors.map(i => writeChildrenOfItem(i, data));
-    }, [data]);
+  const formattedList = useMemo(() => generateNodeTree(data), [data]);
+
+  var alternativeResult = generateNodeTree(data);
+  console.log(alternativeResult);
 
   return (
     children(formattedList)
